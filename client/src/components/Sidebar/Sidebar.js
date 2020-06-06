@@ -1,0 +1,131 @@
+import React, { Component  } from 'react';
+import {Link, Route} from 'react-router-dom';
+import '../../fonts/fonts.css';
+import './Sidebar.css';
+
+import MatchMini from '../MatchMini/MatchMini';
+import MessageMini from '../MessageMini/MessageMini';
+import DevProfile from '../DevProfile/DevProfile';
+import EditProfile from '../EditProfile/EditProfile'
+
+class Sidebar extends Component {
+    constructor() {
+        super()
+        this.state = {
+            sidebarDisplay: 'matches',
+            sidebarEdit: false
+        }
+    }
+    componentDidMount() {
+        if(this.props.callback) this.props.callback();
+        console.log("sidebarprops: ", this.props);
+        this.props.sessionCheck();
+    }
+
+    populateUserMatches = () => {
+
+        //foreach match in database
+        //return <MatchMini name={name} photoURL={photoURL} />
+        //start message view on click
+
+    }
+
+
+    setMatchesView = () => {
+        this.setState( { sidebarDisplay: 'matches' } );
+
+    }
+
+    setMessagesView = () => {
+        this.setState( { sidebarDisplay: 'messages' } );
+    }
+
+    setCardView = () => {
+        this.props.setMainViewState("cards");
+    }
+    
+    toggleSidebarProfileEdit = () => {
+        let st = !this.state.sidebarEdit;
+        this.setState({ sidebarEdit: st }, this.logState);
+
+    }
+
+    logState = () => console.log(this.state);
+
+    render() {
+       
+        let url = 'https://picsum.photos/98/98';
+
+        let username = this.props.username;
+        let picture = this.props.picture;
+
+     
+
+        return (
+            <div className="Sidebar" onClick={this.toggleSidebarProfileEdit}>
+                <div className="Sidebar__Profile" >
+                    <img className="Sidebar__Profile__Picture" src={picture} />
+                    <div>{username}</div>
+                </div>
+
+                <div className="Sidebar__Views">
+
+                { this.state.sidebarDisplay === 'matches' ?
+                    <>
+                        <div className="MatchesViewLink active" ><Link to="/" onClick={this.setMatchesView}>Matches</Link></div>
+                        <div className="MessagesViewLink"><Link to="/messages" onClick={this.setMessagesView}>Messages</Link></div>
+                    </>
+                :
+                <>
+                    <div className="MatchesViewLink" ><Link to="/" onClick={this.setMatchesView}>Matches</Link></div>
+                    <div className="MessagesViewLink active"><Link to="/messages" onClick={this.setMessagesView}>Messages</Link></div>
+                </>
+                }
+                
+                </div>
+
+
+            {this.state.sidebarDisplay === 'matches' ? 
+
+                    <div className="Sidebar__Matches__Container">
+                    <div className="Sidebar__Matches__Container__Mini">
+                        <MatchMini name="Daniel" photoURL={url} /> 
+                        <MatchMini name="Galen" photoURL={url} /> 
+                        <MatchMini name="Shimin" photoURL={url} /> 
+                        <MatchMini name="Roger" photoURL={url} /> 
+                        <MatchMini name="Noah" photoURL={url} /> 
+                        </div>
+                    </div>
+
+            : 
+                
+                <div className="Sidebar__Message__Container">
+                    {/* <h1>Messages View</h1> */}
+                        <MessageMini name="Daniel" photoURL={url} setMainViewState={this.props.setMainViewState} /> 
+                        <MessageMini name="Galen" photoURL={url} setMainViewState={this.props.setMainViewState}/> 
+                        <MessageMini name="Shimin" photoURL={url} setMainViewState={this.props.setMainViewState} /> 
+                        <MessageMini name="Roger" photoURL={url} setMainViewState={this.props.setMainViewState}/> 
+                        <MessageMini name="Noah" photoURL={url}  setMainViewState={this.props.setMainViewState}/> 
+
+
+
+                </div>    
+            
+            }
+
+            {/* {this.state.sidebarEdit === 'true' ?  */}
+
+            <EditProfile {...this.props.Account} />
+                
+             {/* : ''} */}
+
+
+            </div>
+
+        );
+    }
+}
+
+
+
+export default Sidebar;

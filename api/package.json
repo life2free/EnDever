@@ -1,0 +1,32 @@
+{
+  "name": "tigerkingbackend",
+  "version": "1.0.0",
+  "description": "An backend API for managing a database of users for EnDever application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digitalfences/TigerKingBackEnd.git"
+  },
+  "author": "Galen Emanuel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/digitalfences/TigerKingBackEnd/issues"
+  },
+  "homepage": "https://github.com/digitalfences/TigerKingBackEnd#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "mongoose": "^5.9.10",
+    "node-fetch": "^2.6.0",
+    "passport": "^0.4.1",
+    "passport-github2": "^0.1.12"
+  }
+}
