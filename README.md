@@ -10,8 +10,8 @@ Build a full stack application for developers to share ideas, discuss technologi
 
 Utilized the React for front-end. Express for back-end, MongoDB for database, passport for GitHub OAuth2. See the readmes for the API(back-end) and Client(front-end):
 
-- [!API Readme](https://github.com/life2free/EnDever/tree/master/api)
-- [!Client Readme](https://github.com/life2free/EnDever/tree/master/client)
+- [API Readme](https://github.com/life2free/EnDever/tree/master/api)
+- [Client Readme](https://github.com/life2free/EnDever/tree/master/client)
 
 ## Contribute
 
