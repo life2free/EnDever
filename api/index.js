@@ -159,7 +159,7 @@ app.get("/users", (req, res) => {
           });
       });
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
@@ -187,7 +187,7 @@ app.get("/matches/:id", (req, res) => {
       })
     );
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
@@ -232,7 +232,7 @@ app.put("/profile/:id", (req, res) => {
       }
     });
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
