@@ -116,19 +116,53 @@ app.get("/logout", function (req, res) {
   res.redirect(`${Config.FRONTEND_URL}`);
 });
 
+// app.get("/users", (req, res) => {
+//   if (req.isAuthenticated()) {
+//     User.find()
+//       .populate("Login")
+//       .populate("Account")
+//       .then((user) => {
+//         user.sort(() => Math.random() - 0.5);
+//         res.json(user);
+//       });
+//   } else {
+//     res.redirect(`${Config.FRONTEND_URL}`);
+//   }
+// });
+
 app.get("/users", (req, res) => {
   if (req.isAuthenticated()) {
-    User.find()
-      .populate("Login")
+    User.findOne({ _id: req.user._id })
       .populate("Account")
       .then((user) => {
-        user.sort(() => Math.random() - 0.5);
-        res.json(user);
+        User.find({ _id: { $ne: req.user._id } })
+          .populate("Login")
+          .populate("Account")
+          .then((users) => {
+            let matched = [];
+            let liked = [];
+
+            matched = user.Account.MatchedUsers.slice();
+            liked = user.Account.LikedUsers.slice();
+
+            matched.push(...liked);
+
+            let matchedIdList = [];
+            matched.map((match) => matchedIdList.push(match._id));
+
+            let feed = users.filter((item) => {
+              return matchedIdList.indexOf(item._id) === -1;
+            });
+            feed.sort(() => Math.random() - 0.5);
+            res.json(feed);
+            //res.json(users);
+          });
       });
   } else {
-    res.redirect(`${Config.FRONTEND_URL}`);
+    res.redirect(`${configs.FRONTEND_URL}`);
   }
 });
+
 app.get("/account/name/:userName", (req, res) => {
   if (req.isAuthenticated()) {
     User.find({ UserName: req.params.userName })
@@ -137,6 +171,23 @@ app.get("/account/name/:userName", (req, res) => {
       .then((user) => res.json(user));
   } else {
     res.redirect(`${Config.FRONTEND_URL}`);
+  }
+});
+
+app.get("/matches/:id", (req, res) => {
+  if (req.isAuthenticated()) {
+    User.findOne(
+      { _id: req.params.id }.then((user) => {
+        Account.findOne({ _id: user.Account })
+          .populate("MatchedUsers")
+          .populate("Messages")
+          .then((account) => {
+            res.json(account);
+          });
+      })
+    );
+  } else {
+    res.redirect(`${configs.FRONTEND_URL}`);
   }
 });
 
@@ -161,6 +212,30 @@ app.put("/users/:id", (req, res) => {
   }
 });
 
+app.put("/profile/:id", (req, res) => {
+  /*
+  we want to edit whatever fields are passed on the user object
+  req.body = {
+    RealName:String
+    Bio: String
+    Workplace: String
+  }
+  */
+  if (req.isAuthenticated()) {
+    User.find({ _id: req.params.id }).then((user) => {
+      if (user !== undefined) {
+        Account.findOneAndUpdate({ _id: user.Account }, req.body).then(
+          (account) => {
+            res.json(account);
+          }
+        );
+      }
+    });
+  } else {
+    res.redirect(`${configs.FRONTEND_URL}`);
+  }
+});
+
 app.put("/profile/:edit", (req, res) => {
   if (req.isAuthenticated()) {
     User.find({ UserName: req.params.edit }).then((res) => {
@@ -182,6 +257,20 @@ app.delete("/users/:id", (req, res) => {
     User.findOneByDelete({ _id: req.params.id }).then((user) => res.json(user));
   } else {
     res.redirect(`${Config.FRONTEND_URL}`);
+  }
+});
+
+app.put("/like/:id", (req, res) => {
+  if (req.isAuthenticated()) {
+    /* 
+    Match Logic:
+    req should have the id of the current login user, and the id of the profile that they like
+    then it should check the like array of the person being liked to see if they like current user
+    then if user is present, add them to each others match array and delete from likes
+    else add the target to users liked array and return
+    */
+    User.findOneByDelete({ _id: req.params.id }).then((user) => res.json(user));
+  } else {
   }
 });
 
