@@ -8,10 +8,17 @@ Build a full stack application for developers to share ideas, discuss technologi
 
 ## Technologies Utilized
 
-Utilized the React for front-end. Express for back-end, MongoDB for database, passport for GitHub OAuth2. See the readmes for the API(back-end) and Client(front-end):
+Utilized the React for front end. Express for backend, MongoDB for database, passport for GitHub OAuth2. See the readmes for the API(back-end) and Client(front-end):
 
 - [API Readme](https://github.com/life2free/EnDever/tree/master/api)
 - [Client Readme](https://github.com/life2free/EnDever/tree/master/client)
+
+## Deployment
+
+Deployed the front end on Netlify, backend on Heroku.
+
+- Frontend: https://endeverweb.netlify.app
+- Backend: https://endeverapi.herokuapp.com
 
 ## Contribute
 

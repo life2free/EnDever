@@ -12,6 +12,6 @@ EnDever is a full stack application aimed at providing a communication platform 
 - passport
 - passport github2
 
-## API Deployment
+## Deployment
 
 - Deployed on Heroku: https://endeverapi.herokuapp.com
