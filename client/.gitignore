@@ -2,14 +2,13 @@
 .netlify
 node_modules
 .vscode/*
-build
 
 
 # testing
 /coverage
 
 # production
-/build
+build
 
 # misc
 .DS_Store
