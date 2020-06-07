@@ -24,20 +24,21 @@ function checkUserOrSave(profile, done) {
             Username: userName,
           };
           Login.create(_loginUser).then((_login) => {
-            let feeds = [];
-            User.find({}).then((users) => {
-              if (users !== undefined) {
-                for (_user in users) {
-                  feeds.push(_user._id);
-                }
-              }
-            });
+            // let feeds = [];
+            // User.find({}).then((users) => {
+            //   if (users !== undefined) {
+            //     for (_user in users) {
+            //       feeds.push(_user._id);
+            //     }
+            //   }
+            // });
             let account = {
-              RealName: name,
+              RealName: userInfo.name,
+              WorkPlace: userInfo.company,
               Picture: userInfo.avatar_url,
               Bio: userInfo.bio,
               Repositories: repoList,
-              Feed: feeds,
+              // Feed: feeds,
             };
 
             Account.create(account).then((_account) => {
