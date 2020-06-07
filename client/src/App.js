@@ -9,28 +9,24 @@ import {
 import axios from "axios";
 import endevercircle from "./img/endevercircle.png";
 import GitHubLogo from "./img/GitHub_Logo_White.png";
+import Config from "./utils/Config";
 
 import "./App.css";
 import "./animate.css";
 import "./fonts/fonts.css";
-
 
 //For testing
 import Navbar from "./components/Navbar/Navbar";
 import Sidebar from "./components/Sidebar/Sidebar";
 import DevCard from "./components/DevCard/DevCard";
 import Messenger from "./components/Messenger/Messenger";
-import NoProfiles from './components/NoProfiles/NoProfiles';
+import NoProfiles from "./components/NoProfiles/NoProfiles";
 
 class App extends Component {
   constructor() {
     super();
     //temporary...
-    // let authURL = "https://github.com/login/oauth/authorize?client_id=0be8114f0f94de54ce72&&redirect_uri=http://localhost:4000/auth/github/callback";
-    // let authURL = "https://github.com/login/oauth/authorize?client_id=fda597fe607c7161f2a0&&redirect_uri=https://tigerkingbackend.herokuapp.com/auth/github/callback"
-      //"https://github.com/login/oauth/authorize?client_id=0be8114f0f94de54ce72&&redirect_uri=http://localhost:4000/auth/github/callback";
-    // let authURL = 'http://localhost:4000/auth/github';
-    let authURL = 'https://tigerkingbackend.herokuapp.com/login';
+    let authURL = `${Config.RESTAPI_BASEURL}/login`;
     this.state = {
       auth: false,
       primaryDisplay: "messenger",
@@ -39,15 +35,15 @@ class App extends Component {
       Username: "",
       // Bio: "",
       WorkPlace: "",
-      RealName: "", 
-      profilesLoaded: false
+      RealName: "",
+      profilesLoaded: false,
     };
   }
 
   componentDidMount() {
     this.sessionCheck();
     this.getDevCardArray();
-    this.setMainViewState(); 
+    this.setMainViewState();
     // this.getMyUserData();
   }
 
@@ -56,124 +52,123 @@ class App extends Component {
     window.location = this.state.authURL;
   };
 
-
   getMyUserData = () => {
     let account = this.state.Account;
-    axios.get(`https://tigerkingbackend.herokuapp.com/account/id/${account}`, {
-       
-      withCredentials: true,
-      headers: {
-       
-        "Content-Type": "application/json",
-      },
-    })
-    .then((res) => {
-      // console.log(res);
-      if (res.data === undefined || res.data === null) {
-        console.log("the account fetch data is null");
-      } else {
-        if (res.data._id !== undefined) {
-          this.setState(
-            {
-              Bio: res.data.Account.Bio,
-              Picture: res.data.Account.Picture,
-              // Account: res.data.Account,
-              // Login: res.data.Login,
-            },
-            this.logState
-          );
+    axios
+      .get(`${Config.RESTAPI_BASEURL}/account/id/${account}`, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        // console.log(res);
+        if (res.data === undefined || res.data === null) {
+          console.log("the account fetch data is null");
         } else {
-          console.log("res.data._id is null");
+          if (res.data._id !== undefined) {
+            this.setState(
+              {
+                Bio: res.data.Account.Bio,
+                Picture: res.data.Account.Picture,
+                // Account: res.data.Account,
+                // Login: res.data.Login,
+              },
+              this.logState
+            );
+          } else {
+            console.log("res.data._id is null");
+          }
         }
-      }
-
-    });
-
-  }
+      });
+  };
 
   getDevCardArray = () => {
-    let url = "https://tigerkingbackend.herokuapp.com/users";
-    axios.get(url, {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      withCredentials: true
-    }).then( res => {
-      this.setState( { 
-          profiles: res.data,
-          profilesLoaded: true
-      },this.logState)
-      console.log("axios user fetch:", res);
-    })
-  }
+    let url = `${Config.RESTAPI_BASEURL}/users`;
+    axios
+      .get(url, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      })
+      .then((res) => {
+        this.setState(
+          {
+            profiles: res.data,
+            profilesLoaded: true,
+          },
+          this.logState
+        );
+        console.log("axios user fetch:", res);
+      });
+  };
 
   reloadDevCard = () => {
     // this.setState({profilesLoaded: false}).then(this.setState({profilesLoaded: true})))
-  }
+  };
 
   renderDevCard = () => {
-    if(Array.isArray(this.state.profiles)) {
+    if (Array.isArray(this.state.profiles)) {
       let stateProfileArray = this.state.profiles.slice();
       let currentProfile = stateProfileArray.shift();
 
-
       // this.setState( { currentProfile: currentProfile } );
 
-
-
-      return (<DevCard 
-                sessionCheck={this.sessionCheck} 
-                profile={currentProfile}
-                swipeLeft={this.swipeLeft}
-                swipeRight={this.swipeRight}
-              />);
-      
-
+      return (
+        <DevCard
+          sessionCheck={this.sessionCheck}
+          profile={currentProfile}
+          swipeLeft={this.swipeLeft}
+          swipeRight={this.swipeRight}
+        />
+      );
     }
-  } 
-
+  };
 
   swipeRight = () => {
     // alert('yay');
     let stateProfileArray = this.state.profiles;
-    if(this.state.profiles.length === 1) {
-        this.setState({ profilesLoaded: false })
+    if (this.state.profiles.length === 1) {
+      this.setState({ profilesLoaded: false });
     }
     stateProfileArray.shift();
-    this.setState({
+    this.setState(
+      {
         // currentProfile: nextProfile,
         profiles: stateProfileArray,
-        profilesLoaded: false
-
-    }, this.toggleLoaded)
+        profilesLoaded: false,
+      },
+      this.toggleLoaded
+    );
 
     console.log("swiped right");
 
     // let nextProfile = this.state.profiles[0];
-
-
-  }
+  };
 
   swipeLeft = () => {
     // alert('nay');
     let stateProfileArray = this.state.profiles;
     // let currentProfile = stateProfileArray.shift();
 
-      stateProfileArray.push(stateProfileArray.shift());
-      this.setState({
-          profiles: stateProfileArray,
-          profilesLoaded: false
-      }, this.toggleLoaded)
+    stateProfileArray.push(stateProfileArray.shift());
+    this.setState(
+      {
+        profiles: stateProfileArray,
+        profilesLoaded: false,
+      },
+      this.toggleLoaded
+    );
 
-      console.log("swiped left");
-  }
+    console.log("swiped left");
+  };
 
   toggleLoaded = () => {
     this.setState({
-      profilesLoaded: !this.state.profilesLoaded
-    })
-  }
-
+      profilesLoaded: !this.state.profilesLoaded,
+    });
+  };
 
   setMainViewState = (force = "") => {
     console.log("the state ");
@@ -201,7 +196,7 @@ class App extends Component {
 
   setMessengerID = (id) => {
     axios
-      .get(`https://tigerkingbackend.herokuapp.com/message/${id}`, {
+      .get(`${Config.RESTAPI_BASEURL}/message/${id}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -210,16 +205,15 @@ class App extends Component {
         });
       });
   };
-  
+
   logState = () => {
     console.log(this.state);
   };
   sessionCheck = () => {
-    axios.get("https://tigerkingbackend.herokuapp.com/sessioncheck", {
-       
+    axios
+      .get(`${Config.RESTAPI_BASEURL}/sessioncheck`, {
         withCredentials: true,
         headers: {
-         
           "Content-Type": "application/json",
         },
       })
@@ -237,7 +231,7 @@ class App extends Component {
                 Username: res.data.UserName,
                 Account: res.data.Account,
                 Login: res.data.Login,
-                Matches: res.data.Account.MatchedUsers
+                Matches: res.data.Account.MatchedUsers,
               },
               this.logState
             );
@@ -245,7 +239,6 @@ class App extends Component {
             console.log("res.data._id is null");
           }
         }
-
       });
   };
 
@@ -261,12 +254,11 @@ class App extends Component {
             </header>
             <main className="FlexViews">
               <Switch>
-     
                 <Route
                   path="/messages"
                   render={(routerProps) => {
                     return (
-                      <Sidebar 
+                      <Sidebar
                         username={this.state.Username}
                         picture={this.state.Account.Picture}
                         sessionCheck={this.sessionCheck}
@@ -284,8 +276,8 @@ class App extends Component {
                   render={(routerProps) => {
                     return (
                       <Sidebar
-                      username={this.state.Username}
-                      picture={this.state.Account.Picture} 
+                        username={this.state.Username}
+                        picture={this.state.Account.Picture}
                         sessionCheck={this.sessionCheck}
                         {...routerProps}
                         {...this.state}
@@ -303,8 +295,8 @@ class App extends Component {
                     //this.setMessengerID();
                     return (
                       <Sidebar
-                      username={this.state.Username}
-                      picture={this.state.Account.Picture}
+                        username={this.state.Username}
+                        picture={this.state.Account.Picture}
                         sessionCheck={this.sessionCheck}
                         {...routerProps}
                         {...this.state}
@@ -320,26 +312,28 @@ class App extends Component {
                   render={(routerProps) => {
                     // this.setMainViewState("cards");
                     return (
-                        <>
-                        <Sidebar 
-                            username={this.state.Username}
-                            picture={this.state.Account.Picture}
-                            sessionCheck={this.sessionCheck}
-                            {...routerProps}
-                            {...this.state}
-                            matches
-                            setMainViewState={this.setMainViewState}
-                        >
-                        </Sidebar>
-                      {this.state.profilesLoaded === true && (this.state.profiles != null) ? 
-                        // <DevCard
-                        //   sessionCheck={this.sessionCheck}
-                        //   {...routerProps}
-                        //   {...this.state}
-                        //   matches
-                        // ></DevCard>
-                          this.renderDevCard() 
-                        : <NoProfiles /> }
+                      <>
+                        <Sidebar
+                          username={this.state.Username}
+                          picture={this.state.Account.Picture}
+                          sessionCheck={this.sessionCheck}
+                          {...routerProps}
+                          {...this.state}
+                          matches
+                          setMainViewState={this.setMainViewState}
+                        ></Sidebar>
+                        {this.state.profilesLoaded === true &&
+                        this.state.profiles != null ? (
+                          // <DevCard
+                          //   sessionCheck={this.sessionCheck}
+                          //   {...routerProps}
+                          //   {...this.state}
+                          //   matches
+                          // ></DevCard>
+                          this.renderDevCard()
+                        ) : (
+                          <NoProfiles />
+                        )}
                       </>
                     );
                   }}
