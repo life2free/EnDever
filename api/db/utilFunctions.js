@@ -2,22 +2,12 @@ const fetch = require("node-fetch");
 const Login = require("./models/Login");
 const Account = require("./models/Account");
 const User = require("./models/User");
+const Config = require("./config.js");
 
-//https://stackoverflow.com/questions/3718282/javascript-shuffling-objects-inside-an-object-randomize
-function shuffle(sourceArray) {
-  for (let i = 0; i < sourceArray.length - 1; i++) {
-    let j = i + Math.floor(Math.random() * (sourceArray.length - i));
-    let temp = sourceArray[j];
-    sourceArray[j] = sourceArray[i];
-    sourceArray[i] = temp;
-  }
-  return sourceArray;
-}
 function checkUserOrSave(profile, done) {
   let userInfo = profile._json;
   let userName = userInfo.login;
-  let reposUrl = "https://api.github.com/users/" + userName + "/repos";
-  let repos = [];
+  let reposUrl = `${Config.GITHUB_USERINFOAPI_URL}/${userName}/repos`;
   fetch(reposUrl)
     .then((res) => res.json())
     .then((res) => {
@@ -34,9 +24,6 @@ function checkUserOrSave(profile, done) {
             Username: userName,
           };
           Login.create(_loginUser).then((_login) => {
-            console.log("user create Success!");
-            console.log("repos");
-            console.log(repoList);
             let feeds = [];
             User.find({}).then((users) => {
               if (users !== undefined) {
@@ -71,4 +58,4 @@ function checkUserOrSave(profile, done) {
       });
     });
 }
-module.exports = { checkUserOrSave, shuffle };
+module.exports = { checkUserOrSave };

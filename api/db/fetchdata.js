@@ -1,23 +1,21 @@
 const fs = require("fs");
 const fetch = require("node-fetch");
-const userGithubBaseUrl = "https://api.github.com/users/";
+const Config = require("./config.js");
+const userGithubBaseUrl = `${Config.GITHUB_USERINFOAPI_URL}/`;
 const usersJsonDataFilePath = "./db/users.json";
 const reposJsonDataFilePath = "./db/repos.json";
 
 // const user = ["life2free", "Daniel-Edminster", "digitalfences", "Athly23"];
-const user = ["Daniel-Edminster", "digitalfences"];
+const user = ["life2free", "Daniel-Edminster", "digitalfences"];
 
 // fetch the source data from api
 function getUserInfoFromApi() {
-  // user.map((item) => {
-  //   console.log(item);
   for (let i = 0; i < user.length; i++) {
     let index = i;
     let item = user[index];
     let userInfoUrl = userGithubBaseUrl + item;
 
     fetch(userInfoUrl)
-      //   .then((res) => res.json())
       .then((res) => {
         return res.text();
       })
@@ -58,20 +56,8 @@ function getRepoFromApi() {
     let reposUrl = userGithubBaseUrl + item + "/repos";
     console.log(reposUrl);
     fetch(reposUrl)
-      //   .then((res) => res.json())
       .then((res) => res.text())
-      // .then((res) => res.text())
       .then((res) => {
-        // console.log(res);
-        // if (i === 1) {
-        //   res = "[" + res + ",";
-        // } else if (i === user.length - 1) {
-        //   res = res + "]";
-        // } else {
-        //   res = res + ",";
-        // }
-
-        // res = JSON.stringify(res);
         console.log(res);
         res = res.replace("[", "");
         res = res.replace("]", "");

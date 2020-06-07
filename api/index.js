@@ -6,7 +6,7 @@ const cors = require("cors");
 const GitHubStrategy = require("passport-github2").Strategy;
 const userRouter = require("./db/routes/userRouter");
 const utilFunctions = require("./db/utilFunctions");
-const configs = require("./db/configs.js");
+const Config = require("./db/config.js");
 const bodyParser = require("body-parser");
 const User = require("./db/models/User.js");
 const Account = require("./db/models/Account.js");
@@ -14,7 +14,7 @@ const Login = require("./db/models/Login.js");
 
 app.use(cors());
 app.use(bodyParser.json());
-app.set("port", process.env.PORT || configs.PORT);
+app.set("port", process.env.PORT || Config.PORT);
 app.use(userRouter);
 app.listen(app.get("port"), () => {
   console.log(` PORT: ${app.get("port")} `);
@@ -27,7 +27,7 @@ function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  //res.redirect(`${configs.FRONTEND_URL}`);
+  //res.redirect(`${Config.FRONTEND_URL}`);
 }
 
 passport.serializeUser(function (user, done) {
@@ -44,24 +44,18 @@ app.use(function (req, res, next) {
     "Origin, X-Requested-With, Content-Type, Accept"
   );
   res.header("Access-Control-Allow-Credentials", "true");
-  //res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://agitated-panini-b410aa.netlify.app"
-  );
+  res.header("Access-Control-Allow-Origin", `${Config.FRONTEND_URL}`);
   next();
 });
 
 passport.use(
   new GitHubStrategy(
     {
-      clientID: configs.GITHUB_CLIENT_ID,
-      clientSecret: configs.GITHUB_CLIENT_SECRET,
-      callbackURL: configs.GITHUB_CALLBACK_URL,
+      clientID: Config.GITHUB_CLIENT_ID,
+      clientSecret: Config.GITHUB_CLIENT_SECRET,
+      callbackURL: Config.GITHUB_CALLBACK_URL,
     },
     function (accessToken, refreshToken, profile, done) {
-      //console.log("profile");
-      //console.log(profile);
       // asynchronous verification, for effect...
 
       utilFunctions.checkUserOrSave(profile, done);
@@ -78,11 +72,8 @@ app.get("/", (req, res) => {
   res.send("<a href='/secret'>Access Secret Area</a>");
 });
 
-//shimin code
-
 app.get("/login", (req, res) => {
   //   res.send("<a href='/auth/github'>Sign in With GitHub</a>");
-  //   res.redirect("http://localhost:3000/login");
   res.redirect("/auth/github");
 });
 
@@ -96,11 +87,9 @@ app.get(
   "/auth/github/callback",
   passport.authenticate("github", {
     failureRedirect: "/logout",
-    // successRedirect: "http://localhost:3000/user/",
   }),
   function (req, res) {
-    console.log(req);
-    res.redirect(`${configs.FRONTEND_URL}/`);
+    res.redirect(`${Config.FRONTEND_URL}/`);
   }
 );
 
@@ -115,23 +104,16 @@ app.get("/sessioncheck", (req, res) => {
     res.json({ auth: false });
   }
 });
-// app.get(
-//   "/auth/github/callback",
-//   passport.authenticate("github", {
-//     failureRedirect: "/logout",
-//     successRedirect: "/user",
-//   })
-// );
 
 app.get("/user", function (req, res) {
   console.log("callback");
   console.log(res);
-  res.redirect(`${configs.FRONTEND_URL}/user`);
+  res.redirect(`${Config.FRONTEND_URL}/user`);
 });
 
 app.get("/logout", function (req, res) {
   req.logout();
-  res.redirect(`${configs.FRONTEND_URL}`);
+  res.redirect(`${Config.FRONTEND_URL}`);
 });
 
 app.get("/users", (req, res) => {
@@ -144,7 +126,7 @@ app.get("/users", (req, res) => {
         res.json(user);
       });
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 app.get("/account/name/:userName", (req, res) => {
@@ -154,7 +136,7 @@ app.get("/account/name/:userName", (req, res) => {
       .populate("Account")
       .then((user) => res.json(user));
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
@@ -165,43 +147,21 @@ app.get("/account/id/:id", (req, res) => {
       .populate("Account")
       .then((user) => res.json(user));
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
-/**
- * req.body
- * {
- *    Login: {
- *         Token: '',
- *         Name: ''
- *     }
- *    Account: {
- *         Picture: '',
- *         Bio: '',
- *         Repositories: ['']
- *     }
- * }
- */
-//app.post('/', (req,res) => {
-//})
+
 app.put("/users/:id", (req, res) => {
   if (req.isAuthenticated()) {
     User.findOneAndUpdate({ _id: req.params.id }, req.body).then((user) => {
       res.json(user);
     });
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
 app.put("/profile/:edit", (req, res) => {
-  /*
-  req.params.edit = {}
-  we want to edit whatever fields are passed on the user object
-  req.body = {
-
-  }
-  */
   if (req.isAuthenticated()) {
     User.find({ UserName: req.params.edit }).then((res) => {
       if (res !== undefined) {
@@ -213,7 +173,7 @@ app.put("/profile/:edit", (req, res) => {
       }
     });
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
@@ -221,7 +181,7 @@ app.delete("/users/:id", (req, res) => {
   if (req.isAuthenticated()) {
     User.findOneByDelete({ _id: req.params.id }).then((user) => res.json(user));
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
@@ -233,7 +193,7 @@ app.get("/message/:id", (req, res) => {
         res.json(messages);
       });
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
@@ -285,7 +245,7 @@ app.put("/like/:likedUserId", (req, res) => {
       }
     );
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
 
@@ -331,6 +291,6 @@ app.put("/unlike/:unlikedUserId", (req, res) => {
       }
     );
   } else {
-    res.redirect(`${configs.FRONTEND_URL}`);
+    res.redirect(`${Config.FRONTEND_URL}`);
   }
 });
