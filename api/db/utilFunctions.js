@@ -18,45 +18,49 @@ function checkUserOrSave(profile, done) {
           repoList.push(repoUrl);
         }
       });
-      User.findOne({ UserName: userName }).then((loginUser) => {
-        if (loginUser === null || loginUser === undefined) {
-          let _loginUser = {
-            Username: userName,
-          };
-          Login.create(_loginUser).then((_login) => {
-            // let feeds = [];
-            // User.find({}).then((users) => {
-            //   if (users !== undefined) {
-            //     for (_user in users) {
-            //       feeds.push(_user._id);
-            //     }
-            //   }
-            // });
-            let account = {
-              RealName: userInfo.name,
-              WorkPlace: userInfo.company,
-              Picture: userInfo.avatar_url,
-              Bio: userInfo.bio,
-              Repositories: repoList,
-              // Feed: feeds,
+      User.findOne({ UserName: userName })
+        .populate("Account")
+        .then((loginUser) => {
+          if (loginUser === null || loginUser === undefined) {
+            let _loginUser = {
+              Username: userName,
             };
-
-            Account.create(account).then((_account) => {
-              let user = {
-                UserName: _login.Username,
-                Login: _login._id,
-                Account: _account._id,
+            Login.create(_loginUser).then((_login) => {
+              // let feeds = [];
+              // User.find({}).then((users) => {
+              //   if (users !== undefined) {
+              //     for (_user in users) {
+              //       feeds.push(_user._id);
+              //     }
+              //   }
+              // });
+              let account = {
+                RealName: userInfo.name,
+                WorkPlace: userInfo.company,
+                Picture: userInfo.avatar_url,
+                Bio: userInfo.bio,
+                Repositories: repoList,
+                // Feed: feeds,
               };
-              User.create(user).then((_user) => {
-                return done(null, _user);
+
+              Account.create(account).then((_account) => {
+                let user = {
+                  UserName: _login.Username,
+                  Login: _login._id,
+                  Account: _account._id,
+                };
+                User.create(user)
+                  .populate("Account")
+                  .then((_user) => {
+                    return done(null, _user);
+                  });
               });
             });
-          });
-        } else {
-          return done(null, loginUser);
-        }
-        // end of then
-      });
+          } else {
+            return done(null, loginUser);
+          }
+          // end of then
+        });
     });
 }
 module.exports = { checkUserOrSave };
