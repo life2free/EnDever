@@ -1,6 +1,6 @@
 # EnDever
 
-EnDever is a full stack application aimed at providing a communication platform for developers to share ideas, discuss technologies.
+A full stack application aimed at providing a communication platform for developers.
 
 ## Descriptions
 
